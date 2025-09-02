@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
   <style>
+    /* Dimensioni esplicite per garantire il rendering della scacchiera */
+    #board { width: 520px; height: 520px; margin: 0 auto; }
+    @media (max-width: 640px){ #board { width: 92vw; height: 92vw; } }
     :root { --gap: 14px; --radius: 16px; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
     header { padding: 18px 20px; background: #0b1222; border-bottom: 1px solid #1f2a44; position: sticky; top: 0; z-index: 2; }
@@ -84,14 +87,14 @@
   </main>
 
   <!-- Dipendenze -->
-  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
-  <script>
+  <script defer>
     // --- Stockfish come Web Worker tramite Blob che importa dallo CDN (CORS-safe) ---
     function createStockfish() {
       const blob = new Blob([
-        `importScripts('https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.wasm.js');` // usa WASM/JS auto
+        `importScripts('https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.js');` // usa WASM/JS auto
       ], { type: 'application/javascript' });
       return new Worker(URL.createObjectURL(blob));
     }
@@ -276,6 +279,8 @@
         onDrop,
         onSnapEnd,
       });
+      // ridimensiona al resize della finestra
+      window.addEventListener('resize', () => board.resize());
     }
 
     // Avvio
