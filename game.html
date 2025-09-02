@@ -1,0 +1,84 @@
+<html lang="it">
+const m = legal[Math.floor(Math.random()*legal.length)];
+game.move({from:m.from,to:m.to,promotion:'q'});
+board.position(game.fen());
+pushMoves();
+updateStatus();
+}
+return;
+}
+if(engineBusy) return;
+engineBusy = true;
+uci(`position fen ${game.fen()}`);
+uci(`go movetime ${conf.movetime}`);
+}
+
+
+function pushMoves(){
+const hist = game.history({verbose:true});
+let out='';
+for(let i=0;i<hist.length;i+=2){
+const n = (i/2)+1;
+const w = hist[i]?.san || '';
+const b = hist[i+1]?.san || '';
+out += `${n}. ${w} ${b}
+`;
+}
+movesEl.textContent = out.trim();
+movesEl.scrollTop = movesEl.scrollHeight;
+}
+
+
+function updateStatus(){
+let t='';
+if(game.isCheckmate()) t = 'Scacco matto! ' + (game.turn()==='w'?'Vince il Nero.':'Vince il Bianco.');
+else if(game.isDraw()) t = 'Patta.';
+else { const turn = game.turn()==='w'?'Bianco':'Nero'; t = `Tocca al ${turn}.` + (game.inCheck()?' (Scacco!)':''); }
+statusEl.textContent = t;
+}
+
+
+function newGame(){
+game.reset();
+board.start();
+movesEl.textContent='';
+updateStatus();
+if(playerSide==='black') setTimeout(aiMove, 120);
+}
+
+
+function bindUI(){
+document.getElementById('newGameBtn').onclick = newGame;
+document.getElementById('undoBtn').onclick = ()=>{
+if(game.history().length===0) return;
+if(game.turn() === (playerSide==='white'?'w':'b')){ game.undo(); game.undo(); }
+else{ game.undo(); }
+board.position(game.fen()); pushMoves(); updateStatus();
+};
+document.getElementById('flipBtn').onclick = ()=> board.flip();
+}
+
+
+function initBoard(){
+board = Chessboard('board', {
+draggable:true,
+position:'start',
+pieceTheme:'https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/img/chesspieces/wikipedia/{piece}.png',
+onDragStart,onDrop,onSnapEnd
+});
+window.addEventListener('resize', ()=>board.resize());
+if(playerSide==='black') board.orientation('black');
+}
+
+
+// bootstrap
+window.addEventListener('load', ()=>{
+bindUI();
+initBoard();
+initEngine();
+updateStatus();
+if(playerSide==='black') setTimeout(aiMove, 200);
+});
+</script>
+</body>
+</html>
