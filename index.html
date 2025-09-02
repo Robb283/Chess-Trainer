@@ -23,7 +23,7 @@
   <div class="wrap">
     <div class="card">
       <h1>♟️ Scacchi — scegli e gioca</h1>
-      <p class="muted">Seleziona il livello di difficoltà, il colore, poi premi <strong>Inizia partita</strong>.</p>
+      <p class="muted">Seleziona il livello di difficoltà e il colore, poi premi <strong>Inizia partita</strong>.</p>
       <div class="grid">
         <div>
           <div class="muted">Difficoltà</div>
@@ -47,22 +47,19 @@
     </div>
   </div>
   <script>
-    function toggleGroup(groupId){
-      const el = document.getElementById(groupId);
-      el.addEventListener('click', (e)=>{
+    function toggleGroup(id){
+      const el = document.getElementById(id);
+      el.addEventListener('click', e=>{
         if(e.target.tagName!=='BUTTON') return;
-        [...el.querySelectorAll('button')].forEach(b=>b.setAttribute('aria-pressed','false'));
+        el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false'));
         e.target.setAttribute('aria-pressed','true');
       });
     }
-    toggleGroup('difficulty');
-    toggleGroup('side');
-
+    toggleGroup('difficulty'); toggleGroup('side');
     document.getElementById('start').addEventListener('click', ()=>{
       const level = document.querySelector('#difficulty button[aria-pressed="true"]').dataset.level;
-      const side = document.querySelector('#side button[aria-pressed="true"]').dataset.side;
-      const url = `game.html?level=${encodeURIComponent(level)}&side=${encodeURIComponent(side)}`;
-      window.location.href = url;
+      const side  = document.querySelector('#side button[aria-pressed="true"]').dataset.side;
+      location.href = `game.html?level=${encodeURIComponent(level)}&side=${encodeURIComponent(side)}`;
     });
   </script>
 </body>
