@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Partita — Scacchi vs AI</title>
 
-  <!-- Librerie da CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <!-- CDNJS (stabili) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.js"></script>
 
   <style>
     :root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
@@ -28,9 +28,7 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="muted" id="configShow">Config…</div>
-  </header>
+  <header><div class="muted" id="configShow">Config…</div></header>
   <main>
     <div class="layout">
       <section class="card">
@@ -51,7 +49,7 @@
   </main>
 
   <script>
-    function qp(name){ return new URLSearchParams(window.location.search).get(name); }
+    function qp(name){ return new URLSearchParams(location.search).get(name); }
     function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
 
     const level = (qp('level')||'easy').toLowerCase();
@@ -86,8 +84,7 @@
           engineBusy=false;
           if(mv && mv!=='(none)'){
             game.move({ from: mv.slice(0,2), to: mv.slice(2,4), promotion:'q' });
-            board.position(game.fen());
-            pushMoves(); updateStatus();
+            board.position(game.fen()); pushMoves(); updateStatus();
           } else { updateStatus(); }
         }
       };
@@ -109,8 +106,7 @@
     function onDrop (source, target){
       const move = game.move({ from: source, to: target, promotion: 'q' });
       if (move == null) return 'snapback';
-      board.position(game.fen());
-      pushMoves(); updateStatus();
+      board.position(game.fen()); pushMoves(); updateStatus();
       setTimeout(aiMove, 60);
     }
     function onSnapEnd(){ board.position(game.fen()); }
@@ -122,8 +118,7 @@
         if(legal.length){
           const m = legal[Math.floor(Math.random()*legal.length)];
           game.move({from:m.from,to:m.to,promotion:'q'});
-          board.position(game.fen());
-          pushMoves(); updateStatus();
+          board.position(game.fen()); pushMoves(); updateStatus();
         }
         return;
       }
@@ -162,29 +157,4 @@
     function bindUI(){
       document.getElementById('newGameBtn').onclick = newGame;
       document.getElementById('undoBtn').onclick = ()=>{
-        if(game.history().length===0) return;
-        if(game.turn() === (playerSide==='white'?'w':'b')){ game.undo(); game.undo(); }
-        else{ game.undo(); }
-        board.position(game.fen()); pushMoves(); updateStatus();
-      };
-      document.getElementById('flipBtn').onclick = ()=> board.flip();
-    }
-
-    function initBoard(){
-      board = Chessboard('board', {
-        draggable:true,
-        position:'start',
-        pieceTheme:'https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/img/chesspieces/wikipedia/{piece}.png',
-        onDragStart,onDrop,onSnapEnd
-      });
-      window.addEventListener('resize', ()=>board.resize());
-      if(playerSide==='black') board.orientation('black');
-    }
-
-    window.addEventListener('load', ()=>{
-      bindUI(); initBoard(); initEngine(); updateStatus();
-      if(playerSide==='black') setTimeout(aiMove, 200);
-    });
-  </script>
-</body>
-</html>
+        if(game.history().l
