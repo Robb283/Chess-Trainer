@@ -1,4 +1,62 @@
 <html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partita — Scacchi vs AI</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
+<style>
+:root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#e2e8f0}
+header{padding:14px 16px;border-bottom:1px solid var(--b)}
+main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
+.layout{display:grid;gap:16px}
+@media(min-width:980px){.layout{grid-template-columns:520px 1fr}}
+.card{background:var(--card);border:1px solid var(--b);border-radius:var(--radius);padding:14px}
+#board{width:520px;height:520px;margin:0 auto}
+@media(max-width:640px){#board{width:92vw;height:92vw}}
+button{background:#0e1730;color:#e2e8f0;border:1px solid var(--b);border-radius:12px;padding:10px 12px;cursor:pointer}
+.toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.status{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1222;border:1px dashed #28365c;border-radius:12px;padding:10px;min-height:44px}
+.moves{height:340px;overflow:auto;background:#0e1730;border:1px solid var(--b);border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;font-size:14px}
+.muted{color:var(--muted);font-size:12px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+</head>
+<body>
+<header>
+<div class="muted" id="configShow">Config…</div>
+</header>
+<main>
+<div class="layout">
+<section class="card">
+<div id="board"></div>
+<div class="toolbar">
+<button id="newGameBtn">Nuova partita</button>
+<button id="undoBtn">Annulla</button>
+<button id="flipBtn">Gira</button>
+</div>
+</section>
+<section class="card">
+<div class="muted">Stato</div>
+<div class="status" id="status">Caricamento…</div>
+<div class="muted" style="margin-top:10px">Mossette</div>
+<div class="moves" id="moves"></div>
+</section>
+</div>
+</main>
+
+
+<script>
+  function qp(name){ return new URLSearchParams(window.location.search).get(name); }
+
+
+function aiMove(){
+if (game.isGameOver()) { updateStatus(); return; }
+// fallback se l'engine non è pronto
+if(!engine || !engineReady){
+const legal = game.moves({verbose:true});
+if(legal.length){
 const m = legal[Math.floor(Math.random()*legal.length)];
 game.move({from:m.from,to:m.to,promotion:'q'});
 board.position(game.fen());
@@ -82,3 +140,4 @@ if(playerSide==='black') setTimeout(aiMove, 200);
 </script>
 </body>
 </html>
+  
