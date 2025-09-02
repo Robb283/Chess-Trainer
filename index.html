@@ -1,70 +1,69 @@
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Scacchi — Scegli difficoltà</title>
-<style>
-:root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#e2e8f0}
-.wrap{min-height:100dvh;display:grid;place-items:center;padding:24px}
-.card{width:min(760px,94vw);background:var(--card);border:1px solid var(--b);border-radius:var(--radius);padding:20px}
-h1{margin:0 0 10px;font-size:20px}
-.muted{color:var(--muted);font-size:13px}
-.grid{display:grid;gap:12px}
-.seg{display:flex;gap:10px}
-.seg button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--b);background:#0e1730;color:#e2e8f0;cursor:pointer}
-.seg button[aria-pressed="true"]{background:#16244c}
-.cta{margin-top:8px;display:flex;justify-content:flex-end}
-.cta button{padding:12px 16px;border-radius:12px;border:1px solid var(--b);background:#1a2a55;color:#e2e8f0;cursor:pointer}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scacchi — Scegli difficoltà</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#e2e8f0}
+    .wrap{min-height:100dvh;display:grid;place-items:center;padding:24px}
+    .card{width:min(760px,94vw);background:var(--card);border:1px solid var(--b);border-radius:var(--radius);padding:20px}
+    h1{margin:0 0 10px;font-size:20px}
+    .muted{color:var(--muted);font-size:13px}
+    .grid{display:grid;gap:12px}
+    .seg{display:flex;gap:10px}
+    .seg button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--b);background:#0e1730;color:#e2e8f0;cursor:pointer}
+    .seg button[aria-pressed="true"]{background:#16244c}
+    .cta{margin-top:8px;display:flex;justify-content:flex-end}
+    .cta button{padding:12px 16px;border-radius:12px;border:1px solid var(--b);background:#1a2a55;color:#e2e8f0;cursor:pointer}
+  </style>
 </head>
 <body>
-<div class="wrap">
-<div class="card">
-<h1>♟️ Scacchi — scegli e gioca</h1>
-<p class="muted">Seleziona il livello di difficoltà, il colore, poi premi <strong>Inizia partita</strong>.</p>
-<div class="grid">
-<div>
-<div class="muted">Difficoltà</div>
-<div class="seg" id="difficulty">
-<button type="button" data-level="easy" aria-pressed="true">Facile</button>
-<button type="button" data-level="medium">Medio</button>
-<button type="button" data-level="hard">Difficile</button>
-</div>
-</div>
-<div>
-<div class="muted">Colore</div>
-<div class="seg" id="side">
-<button type="button" data-side="white" aria-pressed="true">⚪ Bianco</button>
-<button type="button" data-side="black">⚫ Nero</button>
-</div>
-</div>
-<div class="cta">
-<button id="start">Inizia partita</button>
-</div>
-</div>
-</div>
-</div>
-<script>
-function toggleGroup(groupId){
-const el = document.getElementById(groupId);
-el.addEventListener('click', (e)=>{
-if(e.target.tagName!=='BUTTON') return;
-[...el.querySelectorAll('button')].forEach(b=>b.setAttribute('aria-pressed','false'));
-e.target.setAttribute('aria-pressed','true');
-});
-}
-toggleGroup('difficulty');
-toggleGroup('side');
+  <div class="wrap">
+    <div class="card">
+      <h1>♟️ Scacchi — scegli e gioca</h1>
+      <p class="muted">Seleziona il livello di difficoltà, il colore, poi premi <strong>Inizia partita</strong>.</p>
+      <div class="grid">
+        <div>
+          <div class="muted">Difficoltà</div>
+          <div class="seg" id="difficulty">
+            <button type="button" data-level="easy" aria-pressed="true">Facile</button>
+            <button type="button" data-level="medium">Medio</button>
+            <button type="button" data-level="hard">Difficile</button>
+          </div>
+        </div>
+        <div>
+          <div class="muted">Colore</div>
+          <div class="seg" id="side">
+            <button type="button" data-side="white" aria-pressed="true">⚪ Bianco</button>
+            <button type="button" data-side="black">⚫ Nero</button>
+          </div>
+        </div>
+        <div class="cta">
+          <button id="start">Inizia partita</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleGroup(groupId){
+      const el = document.getElementById(groupId);
+      el.addEventListener('click', (e)=>{
+        if(e.target.tagName!=='BUTTON') return;
+        [...el.querySelectorAll('button')].forEach(b=>b.setAttribute('aria-pressed','false'));
+        e.target.setAttribute('aria-pressed','true');
+      });
+    }
+    toggleGroup('difficulty');
+    toggleGroup('side');
 
-
-document.getElementById('start').addEventListener('click', ()=>{
-const level = document.querySelector('#difficulty button[aria-pressed="true"]').dataset.level;
-const side = document.querySelector('#side button[aria-pressed="true"]').dataset.side;
-const url = `game.html?level=${encodeURIComponent(level)}&side=${encodeURIComponent(side)}`;
-window.location.href = url;
-});
-</script>
+    document.getElementById('start').addEventListener('click', ()=>{
+      const level = document.querySelector('#difficulty button[aria-pressed="true"]').dataset.level;
+      const side = document.querySelector('#side button[aria-pressed="true"]').dataset.side;
+      const url = `game.html?level=${encodeURIComponent(level)}&side=${encodeURIComponent(side)}`;
+      window.location.href = url;
+    });
+  </script>
 </body>
 </html>
