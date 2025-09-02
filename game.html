@@ -1,143 +1,190 @@
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Partita — Scacchi vs AI</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
-<style>
-:root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#e2e8f0}
-header{padding:14px 16px;border-bottom:1px solid var(--b)}
-main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
-.layout{display:grid;gap:16px}
-@media(min-width:980px){.layout{grid-template-columns:520px 1fr}}
-.card{background:var(--card);border:1px solid var(--b);border-radius:var(--radius);padding:14px}
-#board{width:520px;height:520px;margin:0 auto}
-@media(max-width:640px){#board{width:92vw;height:92vw}}
-button{background:#0e1730;color:#e2e8f0;border:1px solid var(--b);border-radius:12px;padding:10px 12px;cursor:pointer}
-.toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
-.status{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1222;border:1px dashed #28365c;border-radius:12px;padding:10px;min-height:44px}
-.moves{height:340px;overflow:auto;background:#0e1730;border:1px solid var(--b);border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;font-size:14px}
-.muted{color:var(--muted);font-size:12px}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Partita — Scacchi vs AI</title>
+
+  <!-- Librerie da CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+  <style>
+    :root{--bg:#0f172a;--card:#0b1222;--muted:#94a3b8;--b:#1f2a44;--radius:16px}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#e2e8f0}
+    header{padding:14px 16px;border-bottom:1px solid var(--b)}
+    main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
+    .layout{display:grid;gap:16px}
+    @media(min-width:980px){.layout{grid-template-columns:520px 1fr}}
+    .card{background:var(--card);border:1px solid var(--b);border-radius:var(--radius);padding:14px}
+    #board{width:520px;height:520px;margin:0 auto}
+    @media(max-width:640px){#board{width:92vw;height:92vw}}
+    button{background:#0e1730;color:#e2e8f0;border:1px solid var(--b);border-radius:12px;padding:10px 12px;cursor:pointer}
+    .toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+    .status{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1222;border:1px dashed #28365c;border-radius:12px;padding:10px;min-height:44px}
+    .moves{height:340px;overflow:auto;background:#0e1730;border:1px solid var(--b);border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;font-size:14px}
+    .muted{color:var(--muted);font-size:12px}
+  </style>
 </head>
 <body>
-<header>
-<div class="muted" id="configShow">Config…</div>
-</header>
-<main>
-<div class="layout">
-<section class="card">
-<div id="board"></div>
-<div class="toolbar">
-<button id="newGameBtn">Nuova partita</button>
-<button id="undoBtn">Annulla</button>
-<button id="flipBtn">Gira</button>
-</div>
-</section>
-<section class="card">
-<div class="muted">Stato</div>
-<div class="status" id="status">Caricamento…</div>
-<div class="muted" style="margin-top:10px">Mossette</div>
-<div class="moves" id="moves"></div>
-</section>
-</div>
-</main>
+  <header>
+    <div class="muted" id="configShow">Config…</div>
+  </header>
+  <main>
+    <div class="layout">
+      <section class="card">
+        <div id="board"></div>
+        <div class="toolbar">
+          <button id="newGameBtn">Nuova partita</button>
+          <button id="undoBtn">Annulla</button>
+          <button id="flipBtn">Gira</button>
+        </div>
+      </section>
+      <section class="card">
+        <div class="muted">Stato</div>
+        <div class="status" id="status">Caricamento…</div>
+        <div class="muted" style="margin-top:10px">Mossette</div>
+        <div class="moves" id="moves"></div>
+      </section>
+    </div>
+  </main>
 
+  <script>
+    function qp(name){ return new URLSearchParams(window.location.search).get(name); }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
 
-<script>
-  function qp(name){ return new URLSearchParams(window.location.search).get(name); }
+    const level = (qp('level')||'easy').toLowerCase();
+    const sideParam = (qp('side')||'white').toLowerCase();
+    const presets = { easy:{skill:1,movetime:250}, medium:{skill:8,movetime:500}, hard:{skill:15,movetime:1200} };
+    const conf = presets[level] || presets.easy;
+    document.getElementById('configShow').textContent = `Livello: ${level} • Lato: ${sideParam}`;
 
+    function createStockfish(){
+      const blob = new Blob([`importScripts('https://cdn.jsdelivr.net/npm/stockfish@16/stockfish.js');`],{type:'application/javascript'});
+      return new Worker(URL.createObjectURL(blob));
+    }
 
-function aiMove(){
-if (game.isGameOver()) { updateStatus(); return; }
-// fallback se l'engine non è pronto
-if(!engine || !engineReady){
-const legal = game.moves({verbose:true});
-if(legal.length){
-const m = legal[Math.floor(Math.random()*legal.length)];
-game.move({from:m.from,to:m.to,promotion:'q'});
-board.position(game.fen());
-pushMoves();
-updateStatus();
-}
-return;
-}
-if(engineBusy) return;
-engineBusy = true;
-uci(`position fen ${game.fen()}`);
-uci(`go movetime ${conf.movetime}`);
-}
+    const game = new Chess();
+    let board, engine = null, engineReady=false, engineBusy=false, playerSide = (sideParam==='black'?'black':'white');
 
+    const statusEl = document.getElementById('status');
+    const movesEl  = document.getElementById('moves');
 
-function pushMoves(){
-const hist = game.history({verbose:true});
-let out='';
-for(let i=0;i<hist.length;i+=2){
-const n = (i/2)+1;
-const w = hist[i]?.san || '';
-const b = hist[i+1]?.san || '';
-out += `${n}. ${w} ${b}
-`;
-}
-movesEl.textContent = out.trim();
-movesEl.scrollTop = movesEl.scrollHeight;
-}
+    function uci(cmd){ if(engine) engine.postMessage(cmd); }
 
+    function initEngine(){
+      if(engine) engine.terminate();
+      engine = createStockfish();
+      engineReady=false; engineBusy=false;
+      engine.onmessage = (e)=>{
+        const line = (''+e.data).trim();
+        if(line==='uciok'){ setOptions(); uci('isready'); }
+        else if(line==='readyok'){ engineReady = true; }
+        else if(line.startsWith('bestmove')){
+          const mv = line.split(' ')[1];
+          engineBusy=false;
+          if(mv && mv!=='(none)'){
+            game.move({ from: mv.slice(0,2), to: mv.slice(2,4), promotion:'q' });
+            board.position(game.fen());
+            pushMoves(); updateStatus();
+          } else { updateStatus(); }
+        }
+      };
+      uci('uci');
+    }
 
-function updateStatus(){
-let t='';
-if(game.isCheckmate()) t = 'Scacco matto! ' + (game.turn()==='w'?'Vince il Nero.':'Vince il Bianco.');
-else if(game.isDraw()) t = 'Patta.';
-else { const turn = game.turn()==='w'?'Bianco':'Nero'; t = `Tocca al ${turn}.` + (game.inCheck()?' (Scacco!)':''); }
-statusEl.textContent = t;
-}
+    function setOptions(){
+      const skill = clamp(parseInt(conf.skill,10),0,20);
+      uci(`setoption name Skill Level value ${skill}`);
+      uci('setoption name Threads value 1');
+      uci('setoption name Hash value 16');
+    }
 
+    function onDragStart (source, piece){
+      if (game.isGameOver()) return false;
+      if ((game.turn()==='w' && playerSide!=='white') || (game.turn()==='b' && playerSide!=='black')) return false;
+      if ((playerSide==='white' && piece.startsWith('b')) || (playerSide==='black' && piece.startsWith('w'))) return false;
+    }
+    function onDrop (source, target){
+      const move = game.move({ from: source, to: target, promotion: 'q' });
+      if (move == null) return 'snapback';
+      board.position(game.fen());
+      pushMoves(); updateStatus();
+      setTimeout(aiMove, 60);
+    }
+    function onSnapEnd(){ board.position(game.fen()); }
 
-function newGame(){
-game.reset();
-board.start();
-movesEl.textContent='';
-updateStatus();
-if(playerSide==='black') setTimeout(aiMove, 120);
-}
+    function aiMove(){
+      if (game.isGameOver()) { updateStatus(); return; }
+      if(!engine || !engineReady){
+        const legal = game.moves({verbose:true});
+        if(legal.length){
+          const m = legal[Math.floor(Math.random()*legal.length)];
+          game.move({from:m.from,to:m.to,promotion:'q'});
+          board.position(game.fen());
+          pushMoves(); updateStatus();
+        }
+        return;
+      }
+      if(engineBusy) return;
+      engineBusy = true;
+      uci(`position fen ${game.fen()}`);
+      uci(`go movetime ${conf.movetime}`);
+    }
 
+    function pushMoves(){
+      const hist = game.history({verbose:true});
+      let out='';
+      for(let i=0;i<hist.length;i+=2){
+        const n = (i/2)+1;
+        const w = hist[i]?.san || '';
+        const b = hist[i+1]?.san || '';
+        out += `${n}. ${w} ${b}\n`;
+      }
+      movesEl.textContent = out.trim();
+      movesEl.scrollTop = movesEl.scrollHeight;
+    }
 
-function bindUI(){
-document.getElementById('newGameBtn').onclick = newGame;
-document.getElementById('undoBtn').onclick = ()=>{
-if(game.history().length===0) return;
-if(game.turn() === (playerSide==='white'?'w':'b')){ game.undo(); game.undo(); }
-else{ game.undo(); }
-board.position(game.fen()); pushMoves(); updateStatus();
-};
-document.getElementById('flipBtn').onclick = ()=> board.flip();
-}
+    function updateStatus(){
+      let t='';
+      if(game.isCheckmate()) t = 'Scacco matto! ' + (game.turn()==='w'?'Vince il Nero.':'Vince il Bianco.');
+      else if(game.isDraw()) t = 'Patta.';
+      else { const turn = game.turn()==='w'?'Bianco':'Nero'; t = `Tocca al ${turn}.` + (game.inCheck()?' (Scacco!)':''); }
+      statusEl.textContent = t;
+    }
 
+    function newGame(){
+      game.reset(); board.start(); movesEl.textContent=''; updateStatus();
+      if(playerSide==='black') setTimeout(aiMove, 120);
+    }
 
-function initBoard(){
-board = Chessboard('board', {
-draggable:true,
-position:'start',
-pieceTheme:'https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/img/chesspieces/wikipedia/{piece}.png',
-onDragStart,onDrop,onSnapEnd
-});
-window.addEventListener('resize', ()=>board.resize());
-if(playerSide==='black') board.orientation('black');
-}
+    function bindUI(){
+      document.getElementById('newGameBtn').onclick = newGame;
+      document.getElementById('undoBtn').onclick = ()=>{
+        if(game.history().length===0) return;
+        if(game.turn() === (playerSide==='white'?'w':'b')){ game.undo(); game.undo(); }
+        else{ game.undo(); }
+        board.position(game.fen()); pushMoves(); updateStatus();
+      };
+      document.getElementById('flipBtn').onclick = ()=> board.flip();
+    }
 
+    function initBoard(){
+      board = Chessboard('board', {
+        draggable:true,
+        position:'start',
+        pieceTheme:'https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/img/chesspieces/wikipedia/{piece}.png',
+        onDragStart,onDrop,onSnapEnd
+      });
+      window.addEventListener('resize', ()=>board.resize());
+      if(playerSide==='black') board.orientation('black');
+    }
 
-// bootstrap
-window.addEventListener('load', ()=>{
-bindUI();
-initBoard();
-initEngine();
-updateStatus();
-if(playerSide==='black') setTimeout(aiMove, 200);
-});
-</script>
+    window.addEventListener('load', ()=>{
+      bindUI(); initBoard(); initEngine(); updateStatus();
+      if(playerSide==='black') setTimeout(aiMove, 200);
+    });
+  </script>
 </body>
 </html>
-  
